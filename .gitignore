@@ -1,0 +1,9 @@
+﻿.venv/
+.idea/
+__pycache__/
+*.pyc
+.env
+config.json
+discovered_urls.json
+scan_results.json
+removal_requests/
