@@ -13,6 +13,7 @@
 | **Phase 1** — Discovery | Searches the web for your name, usernames, photos | ✅ Complete |
 | **Phase 2** — Classification | AI classifies each result by removability & legal basis | ✅ Complete |
 | **Phase 3** — Removal Requests | Generates GDPR emails, CCPA requests, platform guides | ✅ Complete |
+| **API Layer** | FastAPI endpoints for the full pipeline and each phase | ✅ Complete |
 | **Phase 4** — Dashboard | React UI to track everything in one place | 🔜 Coming soon |
 
 ---
@@ -28,6 +29,8 @@ Your name / username / email
         ↓
   Request Generator (Phase 3)  →  GDPR emails, CCPA requests, manual guides
         ↓
+  FastAPI REST API              →  expose the pipeline to any frontend
+        ↓
   Dashboard         (Phase 4)  →  track status of every removal request [coming soon]
 ```
 
@@ -38,6 +41,7 @@ Your name / username / email
 - **Python 3.13** — core engine
 - **ddgs** (DuckDuckGo Search) — free web discovery, no API key needed
 - **Google Gemini API** (gemini-3.8-flash) — AI classification and request generation
+- **FastAPI + Uvicorn** — REST API with interactive OpenAPI documentation
 - **React + Tailwind** — dashboard UI *(Phase 4, coming soon)*
 
 ---
@@ -50,6 +54,7 @@ Paare/
 ├── classifier.py         # Phase 2 — AI classification engine
 ├── phase3_generator.py   # Phase 3 — removal request generator
 ├── pipeline.py           # Full pipeline — runs all 3 phases in one go
+├── main.py               # FastAPI REST API for the complete pipeline
 ├── demo.py               # Phase 2 demo with sample URLs
 ├── requirements.txt      # Python dependencies
 ├── config.json           # API keys (gitignored — never committed)
@@ -116,6 +121,35 @@ python discovery.py          # Phase 1 only — find URLs
 python demo.py               # Phase 2 only — classify sample URLs
 python phase3_generator.py   # Phase 3 only — generate removal requests
 ```
+
+### 7. Run the REST API
+Start the API locally with:
+```bash
+uvicorn main:app --reload
+```
+
+The interactive API documentation is available at [localhost:8000/docs](http://localhost:8000/docs).
+The API also exposes an OpenAPI schema at [localhost:8000/openapi.json](http://localhost:8000/openapi.json).
+
+Available endpoints:
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| `GET` | `/` | API metadata and endpoint list |
+| `GET` | `/health` | Health check |
+| `POST` | `/discover` | Discover URLs for a person |
+| `POST` | `/classify` | Classify discovered URLs |
+| `POST` | `/generate` | Generate removal requests |
+| `POST` | `/scan` | Run all three phases in one request |
+
+Example full scan request:
+```bash
+curl -X POST http://localhost:8000/scan ^
+  -H "Content-Type: application/json" ^
+  -d "{\"name\":\"John Adebayo\",\"usernames\":[\"jadebayo\"],\"email\":\"johnadebayo@gmail.com\",\"deep\":false}"
+```
+
+On macOS/Linux, replace the continuation characters (`^`) with backslashes (`\`).
 
 ---
 
@@ -206,6 +240,7 @@ Paáré leverages real privacy law to back every removal request:
 - [x] Phase 1 — Discovery Engine
 - [x] Phase 2 — AI Classification
 - [x] Phase 3 — Removal Request Generator
+- [x] FastAPI REST API for frontend integration
 - [ ] Phase 4 — React Dashboard
 - [ ] Playwright automation for platform form filling
 - [ ] Email sending integration
